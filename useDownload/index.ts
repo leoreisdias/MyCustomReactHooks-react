@@ -1,4 +1,4 @@
-// NOTE: Call an API and download the result as a file
+// NOTE: Call an API and download the result as a file in the extension you want
 
 import { downloadFileLink } from "./helper";
 
