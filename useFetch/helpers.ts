@@ -23,5 +23,6 @@ export const setResponse = <T = any>(data: any, formatter?: (data: any) => any):
   return data;
 };
 
+// NOTE: Use it only if you put the formatter INSIDE useSWR, so it can provide a "mutate" that attends the formatted type;
 export const setMutation = <T = any>(mutate: KeyedMutator<any>) =>
   mutate as unknown as KeyedMutator<T>;
