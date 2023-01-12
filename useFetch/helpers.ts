@@ -16,7 +16,7 @@ export const convertQueryObjectToString = (query: IQueryParam<any>) => {
 };
 
 export const setResponse = <T = any>(data: any, formatter?: (data: any) => any): T => {
-  if (formatter) {
+  if (formatter && data) {
     return formatter(data);
   }
 
