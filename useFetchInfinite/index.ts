@@ -25,13 +25,16 @@ const useFetchInfinite = <
 ) => {
   type Response = DataFormatted extends undefined ? Data[] : DataFormatted[];
 
-  const { data, error, mutate, setSize, size } = useSWRInfinite<Data, Error>(
-    (index) =>
+ const { data, error, mutate, setSize, size, isLoading } = useSWRInfinite<
+    Data,
+    Error
+  >(
+    index =>
       `${url}?page=${index + 1}&limit=10${
-        query ? `&${convertQueryObjectToString(query)}` : ""
+        query ? `&${convertQueryObjectToString(query)}` : ''
       }`,
-    async (url) => {
-      const res = await axios.get(url);
+    async url => {
+      const res = await api.get(url);
 
       if (formatter) {
         return formatter(res.data.payload) as DataFormatted[];
@@ -42,19 +45,19 @@ const useFetchInfinite = <
     {
       revalidateOnFocus: true,
       ...options,
-    }
+    },
   );
 
   const list: Data[] = [];
 
   const isLoadingMore =
-    size > 0 && data && typeof data[size - 1] === "undefined";
+    size > 0 && data && typeof data[size - 1] === 'undefined';
 
   return {
     data: (data ? list.concat(...data) : []) as Response,
     error,
     mutate,
-    isLoading: !data && !error,
+    isLoading,
     setSize,
     size,
     isLoadingMore,
