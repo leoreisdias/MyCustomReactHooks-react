@@ -14,3 +14,14 @@ export const convertQueryObjectToString = (query: IQueryParam<any>) => {
     .join("&")
     .replace(/&$/, "");
 };
+
+export const setResponse = <T = any>(data: any, formatter?: (data: any) => any): T => {
+  if (formatter) {
+    return formatter(data);
+  }
+
+  return data;
+};
+
+export const setMutation = <T = any>(mutate: KeyedMutator<any>) =>
+  mutate as unknown as KeyedMutator<T>;
