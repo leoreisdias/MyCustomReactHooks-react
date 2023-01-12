@@ -4,7 +4,7 @@ import useSWR, { BareFetcher } from "swr";
 
 import { PublicConfiguration } from "swr/dist/types";
 
-import { convertQueryObjectToString } from "./helpers";
+import { convertQueryObjectToString, setMutation, setResponse } from "./helpers";
 
 export type IQueryParam<
   T = Record<string, string | number | boolean | null | undefined>
@@ -18,39 +18,37 @@ const useFetch = <
   Data = unknown,
   Error = unknown,
   DataFormatted = undefined,
-  QueryParamType = any
+  QueryParamType = any,
 >(
   url: string,
   options?: UseFetchOptions<Data, Error>,
   formatter?: (data: Data) => DataFormatted,
-  query?: IQueryParam<QueryParamType>
+  query?: IQueryParam<QueryParamType>,
 ) => {
-  // response is DataFormatted if exists, otherwise Data
+  // NOTE: response is DataFormatted if exists, otherwise Data
   type Response = DataFormatted extends undefined ? Data : DataFormatted;
 
-  const { data, error, mutate, isLoading, isFetching } = useSWR<Data, Error>(
-    `${url}${query ? `?${convertQueryObjectToString(query)}` : ""}`,
-    async (url) => {
-      const res = await axios.get(url);
-
-      if (formatter) {
-        return formatter(res.data) as DataFormatted;
-      }
+  const { data, error, mutate, isLoading, isValidating } = useSWR<Data, Error>(
+    `${url}${query ? `?${convertQueryObjectToString(query)}` : ''}`,
+    async url => {
+      const res = await api.get(url);
 
       return res?.data;
     },
     {
       revalidateOnFocus: true,
       ...options,
-    }
+    },
   );
 
+  const newMutation = setMutation<Response>(mutate);
+
   return {
-    data: data as Response,
+    data: setResponse<Response>(data, formatter),
     error,
-    mutate,
-    isLoading,
-    isFetching,
+    mutate: newMutation,
+    isLoading: isLoading,
+    isValidating,
   };
 };
 
