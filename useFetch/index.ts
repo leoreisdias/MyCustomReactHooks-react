@@ -4,7 +4,7 @@ import useSWR, { BareFetcher } from "swr";
 
 import { PublicConfiguration } from "swr/dist/types";
 
-import { convertQueryObjectToString, setMutation, setResponse } from "./helpers";
+import { convertQueryObjectToString, setResponse } from "./helpers";
 
 export type IQueryParam<
   T = Record<string, string | number | boolean | null | undefined>
@@ -41,12 +41,10 @@ const useFetch = <
     },
   );
 
-  const newMutation = setMutation<Response>(mutate);
-
   return {
     data: setResponse<Response>(data, formatter),
     error,
-    mutate: newMutation,
+    mutate,
     isLoading: isLoading,
     isValidating,
   };
