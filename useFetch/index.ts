@@ -2,7 +2,7 @@
 
 import useSWR, { BareFetcher } from "swr";
 
-import { PublicConfiguration } from "swr/dist/types";
+import { PublicConfiguration } from "swr/_internal";
 
 import { convertQueryObjectToString, setResponse } from "./helpers";
 
