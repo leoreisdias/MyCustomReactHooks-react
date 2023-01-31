@@ -42,7 +42,7 @@ const useFetch = <
   );
 
   return {
-    data: setResponse<Response>(data, formatter),
+    data: setResponse<Response | undefined>(data, formatter),
     error,
     mutate,
     isLoading: isLoading,
