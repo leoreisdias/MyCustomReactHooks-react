@@ -9,16 +9,12 @@ export const convertQueryObjectToString = (query: IQueryParam<any>) => {
     ([, value]) => value !== undefined && value !== null
   );
 
- if (removedEmptyQuery.length === 0) {
-    return '';
-  }
-
-  return `&${removedEmptyQuery
+  return removedEmptyQuery
     .map(([key, value]) => {
       const content = Array.isArray(value) ? value.join(',') : value;
 
       return `${key}=${content}`;
     })
     .join('&')
-    .replace(/&$/, '')}`;
+    .replace(/&$/, '');
 };
