@@ -31,7 +31,7 @@ const useFetchInfinite = <
   >(
     index =>
       `${url}?page=${index + 1}&limit=10${
-        query ? `&${convertQueryObjectToString(query)}` : ''
+        query ? `${convertQueryObjectToString(query)}` : ''
       }`,
     async url => {
       const res = await api.get(url);
