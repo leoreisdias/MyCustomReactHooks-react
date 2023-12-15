@@ -1,37 +1,51 @@
-// NOTE: Complete use Fetch helper around useSWR fully typed to receive response formatter and typed query params
-
-import useSWR, { BareFetcher } from "swr";
-
-import { PublicConfiguration } from "swr/_internal";
-
-import { convertQueryObjectToString, setResponse } from "./helpers";
-
-export type IQueryParam<
-  T = Record<string, string | number | boolean | null | undefined>
-> = T;
+// eslint-disable-next-line import/no-unresolved
+import useSWR, { BareFetcher } from 'swr';
+import { PublicConfiguration } from 'swr/_internal';
 
 export type UseFetchOptions<Data = unknown, Error = unknown> = Partial<
   PublicConfiguration<Data, Error, BareFetcher<Data>>
 >;
 
-const useFetch = <
+const setResponse = <T = any>(data: any, formatter?: (data: any) => any): T => {
+  if (formatter && data) {
+    return formatter(data);
+  }
+
+  return data;
+};
+
+export type UseFetchQueryParams = { page?: number; [key: string]: unknown };
+
+type UseFetchProps<
+  Data = unknown,
+  Error = unknown,
+  DataFormatted = unknown,
+  QueryParamType = UseFetchQueryParams,
+> = {
+  options?: UseFetchOptions<Data, Error>;
+  formatter?: (data: Data) => DataFormatted;
+  query?: UseFetchQueryParams & QueryParamType;
+};
+
+export const useFetch = <
   Data = unknown,
   Error = unknown,
   DataFormatted = undefined,
-  QueryParamType = any,
+  QueryParamType = UseFetchQueryParams,
 >(
   url: string,
-  options?: UseFetchOptions<Data, Error>,
-  formatter?: (data: Data) => DataFormatted,
-  query?: IQueryParam<QueryParamType>,
+  config?: UseFetchProps<Data, Error, DataFormatted, QueryParamType>,
 ) => {
+  const { formatter, options, query } = config || {};
   // NOTE: response is DataFormatted if exists, otherwise Data
   type Response = DataFormatted extends undefined ? Data : DataFormatted;
 
   const { data, error, mutate, isLoading, isValidating } = useSWR<Data, Error>(
-    `${url}${query ? `?${convertQueryObjectToString(query)}` : ''}`,
-    async url => {
-      const res = await api.get(url);
+    [url, ...Object.values(query ?? {})],
+    async ([url]) => {
+      const res = await api.get(url, {
+        params: query,
+      });
 
       return res?.data;
     },
@@ -42,12 +56,10 @@ const useFetch = <
   );
 
   return {
-    data: setResponse<Response | undefined>(data, formatter),
+    data: setResponse<Response>(data, formatter),
     error,
-    mutate,
+    mutate: mutate,
     isLoading: isLoading,
     isValidating,
   };
 };
-
-export { useFetch };
