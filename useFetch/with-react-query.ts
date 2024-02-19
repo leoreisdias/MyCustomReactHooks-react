@@ -6,7 +6,7 @@ import { SortingState } from '@tanstack/react-table';
 
 type QueryParams = Record<string, any> & {
   pageIndex?: number;
-  sorting?: SortingState;
+  sorting?: SortingState; // Tanstack table type - Adapt for your use case
 };
 
 export const useFetch = <TQueryFnData = TResponse, TError = unknown>(
@@ -27,7 +27,7 @@ export const useFetch = <TQueryFnData = TResponse, TError = unknown>(
       const { pageIndex, sorting, ...rest } = query ?? {};
 
       const { data } = await axios.get<TQueryFnData>(url, {
-        baseURL: '/api',
+        baseURL: '/api-front/my-api', // Route Handler Approach example
         params: {
           ...rest,
           page: !!pageIndex ? pageIndex + 1 : undefined,
