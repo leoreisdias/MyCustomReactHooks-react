@@ -6,33 +6,25 @@ export type UseFetchOptions<Data = unknown, Error = unknown> = Partial<
   PublicConfiguration<Data, Error, BareFetcher<Data>>
 >;
 
-const setResponse = (data: any, formatter?: (data: any) => any) => {
-  if (formatter && data) {
-    return formatter(data);
-  }
-
-  return data;
+export type UseFetchQueryParams = Record<string, any> & {
+  page?: number;
+  // sorting?: SortingState; // Tanstack table type - Adapt for your use case
 };
 
-export type UseFetchQueryParams = { page?: number; [key: string]: unknown };
 
 type UseFetchProps<
   Data = unknown,
-  Error = unknown,
-  DataFormatted = unknown,
-  QueryParamType = UseFetchQueryParams,
+  Error = unknown
 > = {
   options?: UseFetchOptions<Data, Error>;
-  formatter?: (data: Data) => DataFormatted;
-  query?: UseFetchQueryParams & QueryParamType;
+  query?: UseFetchQueryParams;
 };
 
 type ResponseFetch<
   Data = unknown,
   Error = unknown,
-  DateFormatted = undefined,
 > = {
-  data: DateFormatted extends undefined ? Data | undefined : DateFormatted;
+  data: Data;
   error: Error | undefined;
   mutate: KeyedMutator<Data>;
   isLoading: boolean;
@@ -42,14 +34,12 @@ type ResponseFetch<
 
 export const useFetch = <
   Data = unknown,
-  Error = unknown,
-  DataFormatted = undefined,
-  QueryParamType = UseFetchQueryParams,
+  Error = unknown
 >(
   url: string,
-  config?: UseFetchProps<Data, Error, DataFormatted, QueryParamType>,
-): ResponseFetch<Data, Error, DataFormatted> => {
-  const { formatter, options, query } = config || {};
+  config?: UseFetchProps<Data, Error>,
+): ResponseFetch<Data, Error> => {
+  const { options, query } = config || {};
 
   const { data, error, mutate, isLoading, isValidating } = useSWR<Data, Error>(
     [url, ...Object.values(query ?? {})],
@@ -67,7 +57,7 @@ export const useFetch = <
   );
 
   return {
-    data: setResponse(data, formatter),
+    data,
     error,
     mutate: mutate,
     isLoading: isLoading,
